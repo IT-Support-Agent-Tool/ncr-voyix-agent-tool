@@ -8,7 +8,7 @@ The tool replaces the legacy ticketing flow with a faster, keyboard-friendly int
 
 ## Architecture / Flow Diagram
 
-![Architecture and flow diagram](diagram.png)
+![Architecture and flow diagram](diagram (1).png)
 
 ---
 
