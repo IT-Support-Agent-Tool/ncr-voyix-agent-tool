@@ -1,228 +1,187 @@
 # NCR Voyix Agent Tool
 
-![Site Screenshot](446shots_so.png)
+Internal productivity tool for NCR Voyix support agents. A single-page React application that streamlines ticket submission, provides quick access to frequently used commands, documents hardware references, and persists agent data locally. Built with React 18 and Vite, deployed to GitHub Pages.
 
-![Video Preview](prev.gif)
+The tool replaces the legacy ticketing flow with a faster, keyboard-friendly interface: multiple tickets can be open in parallel tabs, command blocks are copy-to-clipboard, and hardware references are filterable by category.
 
-![Video Preview](ezgif-319d48b572c9d66a.gif)
+---
 
-React + Vite application for NCR Voyix support agents.
+## Architecture / Flow Diagram
+
+![Architecture and flow diagram](diagram.png)
+
+---
 
 ## Tech Stack
 
-- React 18 + Vite 5
-- GSAP 3 (animations)
-- Custom hooks (clipboard, localStorage, tabs)
-- GitHub API integration
+| Layer | Technology |
+|---|---|
+| Framework | React 18.3 |
+| Language | JavaScript (ES2020+, JSX) |
+| Build Tool | Vite 5 |
+| Animation | GSAP, `@gsap/react`, Framer Motion |
+| Date Handling | `date-fns`, `date-fns-tz` |
+| Icons | Lucide React |
+| Decorative | `react-snowfall` |
+| Persistence | Browser `localStorage` |
+| Linting | ESLint 9 with `eslint-plugin-react`, `react-hooks`, `react-refresh` |
+| Deployment | GitHub Pages via `gh-pages` |
 
-## Quick Start
+---
 
-```bash
-npm install
-npm run dev
-```
+## Features
+
+- Multi-tab ticket workspace with independent state per ticket, tab switching, and tab close.
+- Clipboard integration via `navigator.clipboard` with a top-anchored notification on success or failure.
+- Commands section with per-command copy buttons and inline status feedback.
+- Hardware reference section with category filters and a filterable image gallery.
+- Save-data cards for storing and deleting agent-side snippets, persisted through `localStorage`.
+- Scroll banner with continuous marquee at the top of the page.
+- Timezone-aware date utilities through `date-fns-tz`.
+- Custom favicon set (SVG, PNG, web manifest) for standalone install.
+- Responsive layout that adapts to narrower agent workstations.
+- No backend required; all state is client-side.
+
+---
 
 ## Project Structure
 
-```
+```text
 ncr-voyix-agent-tool/
-│
 ├── public/
-│   ├── favicon/
-│   ├── Images/
+│   └── favicon/                          Favicon set and web manifest
 ├── src/
 │   ├── components/
 │   │   ├── common/
-│   │   │   ├── ConfirmModal.jsx
-│   │   │   ├── CopyNotification.jsx
-│   │   │   ├── GlobalReminders.jsx
-│   │   │   └── Preloader.jsx
-│   │   │
+│   │   │   ├── CopyNotification.jsx      Top-anchored clipboard status toast
+│   │   │   └── CopyNotification.css
 │   │   ├── layout/
-│   │   │   ├── Header.jsx
-│   │   │   ├── Footer.jsx
-│   │   │   └── ScrollBanner.jsx
-│   │   │
+│   │   │   ├── ScrollBanner.jsx          Continuous marquee banner
+│   │   │   └── ScrollBanner.css
 │   │   └── sections/
-│   │       ├── TicketTemplate/
-│   │       ├── RMA/
 │   │       ├── Commands/
+│   │       │   └── CommandItem.jsx       Command row with copy action
 │   │       ├── Hardware/
-│   │       ├── SORR/
-│   │       ├── Timezone/
-│   │       ├── Reminder/
-│   │       ├── OvernightTask/
-│   │       └── SaveData/
-│   │
-│   ├── data/
-│   │   ├── commands.js
-│   │   └── constants.js
-│   │
+│   │       │   ├── HardwareGallery.jsx   Filterable hardware image gallery
+│   │       │   ├── HardwareGallery.css
+│   │       │   ├── HardwareHelper.css    Filters and layout for hardware section
+│   │       ├── SaveData/
+│   │       │   └── DataCard.jsx          Saved data card with delete action
+│   │       └── TicketTemplate/
+│   │           └── TicketTab.jsx         Single tab in the ticket workspace
 │   ├── hooks/
-│   │   ├── useClipboard.js
-│   │   ├── useLocalStorage.js
-│   │   └── useTabs.js
-│   │
-│   ├── utils/
-│   │   ├── emailHelper.js
-│   │   └── formatters.js
-│   │
+│   │   ├── useClipboard.js               Clipboard write with notification state
+│   │   └── useLocalStorage.js            Persisted state hook
 │   ├── styles/
-│   │   ├── global.css
-│   │   ├── variables.css
-│   │   ├── themes.css
-│   │   └── animations.css
-│   │
-│   ├── App.jsx
-│   ├── App.css
-│   ├── main.jsx
-│   └── index.css
-│
-├── README.md
+│   │   └── animations.css                Shared keyframe animations
+│   ├── App.jsx                           Application root and layout composition
+│   └── main.jsx                          Application bootstrap
+├── eslint.config.js
+├── index.html                            HTML shell with favicon and fonts
 ├── package.json
-└── vite.config.js
-
+└── vite.config.js                        Vite config with base path and aliases
 ```
 
-## Key Features
+---
 
-### 1. Ticket Template
+## Setup and Installation
 
-- Multi-tab system with state persistence
-- Form with 20+ fields grouped logically
-- Copy Summary/Full Text
-- Email escalation (Technical/Customer)
+### Prerequisites
 
-### 2. RMA Section
+- Node.js 20 or newer
+- npm 10 or newer
 
-- 18-field form for hardware returns
-- Tracking integration (DHL, FedEx, UPS)
-- Multiple copy formats
-
-### 3. SORR Section
-
-- Dynamic issue type handling
-- Conditional field rendering
-- Issue-specific notes/warnings
-
-### 4. Commands
-
-- 19 Windows commands
-- Filter by type (info/network/system)
-- One-click copy
-
-### 5. Hardware Helper
-
-- Image gallery (14 items)
-- Filter by category
-
-### 6. Timezone Converter
-
-- Multi-timezone conversion
-- DateTime picker
-
-### 7. Save Data
-
-- LocalStorage persistence
-- Add/Delete with animations
-
-## Custom Hooks
-
-### `useClipboard`
-
-```javascript
-const { copyToClipboard, notification } = useClipboard();
-// Returns: function + notification state
-```
-
-### `useLocalStorage`
-
-```javascript
-const [data, setData] = useLocalStorage("key", initialValue);
-// Returns: [value, setter] with auto-sync
-```
-
-### `useTabs`
-
-```javascript
-const { tabs, activeTab, createTab, closeTab, switchTab } = useTabs();
-// Returns: tab management functions
-```
-
-## Important Implementation Details
-
-### Section Persistence
-
-Components stay mounted but hidden (not unmounted) to preserve state:
-
-```javascript
-<div style={{ display: activeSection === "ticket" ? "block" : "none" }}>
-  <TicketTemplate />
-</div>
-```
-
-### Notification System
-
-Each section manages its own notifications:
-
-```javascript
-const { copyToClipboard, notification } = useClipboard();
-return (
-  <>
-    <CopyNotification notification={notification} />
-    {/* section content */}
-  </>
-);
-```
-
-### Tab Creation Guard
-
-Prevents double creation in React StrictMode:
-
-```javascript
-const isCreatingTab = useRef(false);
-if (isCreatingTab.current) return;
-```
-
-## File Organization
-
-- **Component CSS**: Co-located with JSX files
-- **Path aliases**: `@components`, `@hooks`, `@utils`, `@data`, `@styles`
-- **Formatters**: Centralized in `utils/formatters.js`
-
-## Build
+### Install
 
 ```bash
-npm run build  # Output: dist/
+git clone https://github.com/it-support-agent-tool/ncr-voyix-agent-tool.git
+cd ncr-voyix-agent-tool
+npm install
+```
+
+### Development server
+
+```bash
+npm run dev
+```
+
+Vite serves the application on `http://localhost:3000`.
+
+### Production build
+
+```bash
+npm run build
+```
+
+Output is written to `dist/`.
+
+### Preview production build
+
+```bash
 npm run preview
 ```
 
-## Deploy
+### Lint
 
 ```bash
-# GitHub Pages
-npm run build
-# Push dist/ to gh-pages branch
-
-# Vercel (recommended)
-vercel --prod
+npm run lint
 ```
 
-## GitHub Integration
+### Deploy to GitHub Pages
 
-Footer includes live stats via GitHub API:
+```bash
+npm run deploy
+```
 
-- Stars count
-- Forks count
-- Open issues
+The `predeploy` script runs `npm run build` before publishing `dist/` through `gh-pages`.
 
-## Notes
+---
 
-- StrictMode removed to prevent double useEffect calls
-- GSAP for smooth animations (preloader, transitions)
-- All sections use consistent purple theme (#9968ff)
-- Monospace font for code/technical fields
+## Path Aliases
+
+Aliases are defined in `vite.config.js` and can be used across the codebase:
+
+| Alias | Resolves To |
+|---|---|
+| `@` | `src` |
+| `@components` | `src/components` |
+| `@hooks` | `src/hooks` |
+| `@utils` | `src/utils` |
+| `@data` | `src/data` |
+| `@styles` | `src/styles` |
+
+---
+
+## Deployment
+
+The application is configured for GitHub Pages with a fixed base path:
+
+```text
+/ncr-voyix-agent-tool/
+```
+
+The expected deployment URL is:
+
+```text
+https://it-support-agent-tool.github.io/ncr-voyix-agent-tool/
+```
+
+The `base` value in `vite.config.js` is set to the repository path. If the tool is ever moved to a root-level custom domain, this value must be changed to `/`.
+
+---
+
+## Security & Architecture Considerations
+
+- Fully client-side: no backend, no authentication layer, no server-side session storage.
+- Data persisted in `localStorage` is scoped to the browser profile. Clearing site data removes it.
+- The clipboard hook uses the asynchronous Clipboard API and handles failures with a visible error notification.
+- No third-party tracking, analytics, or external API calls are made by the application.
+- External links, when present, use `rel="noopener noreferrer"`.
+- Google Fonts is loaded through a `<link>` element with `preconnect` to reduce latency.
+- The tool is intended for use by authorized NCR Voyix support personnel on managed workstations.
+
+---
 
 ## License
 
-Created by Ivan Pavlović for NCR Voyix
+Proprietary and internal. Copyright (c) NCR Voyix Agent Tool contributors. All rights reserved. Redistribution or public commercial use without prior written permission is prohibited.
